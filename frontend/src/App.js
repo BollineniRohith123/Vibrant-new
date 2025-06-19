@@ -159,6 +159,8 @@ const AuthProvider = ({ children }) => {
   const value = {
     user,
     login,
+    register,
+    googleLogin,
     logout,
     loading,
     isAuthenticated: !!user,
