@@ -108,6 +108,46 @@ const AuthProvider = ({ children }) => {
     }
   };
 
+  const register = async (name, email, password) => {
+    try {
+      const response = await axios.post(`${API}/auth/register`, { name, email, password });
+      const { access_token, user: userData } = response.data;
+      
+      setToken(access_token);
+      setUser(userData);
+      localStorage.setItem('token', access_token);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+      
+      toast.success('Registration successful!');
+      return true;
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Registration failed');
+      return false;
+    }
+  };
+
+  const googleLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const idToken = await result.user.getIdToken();
+      
+      // Send token to backend for verification
+      const response = await axios.post(`${API}/auth/google`, { token: idToken });
+      const { access_token, user: userData } = response.data;
+      
+      setToken(access_token);
+      setUser(userData);
+      localStorage.setItem('token', access_token);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+      
+      toast.success('Google login successful!');
+      return true;
+    } catch (error) {
+      toast.error('Google login failed');
+      return false;
+    }
+  };
+
   const logout = () => {
     setToken(null);
     setUser(null);
