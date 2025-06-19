@@ -644,7 +644,10 @@ async def get_admin_dashboard(current_user: dict = Depends(get_admin_user)):
     # Get recent bookings
     recent_bookings_cursor = db.bookings.find().sort("created_at", -1).limit(10)
     recent_bookings_raw = await recent_bookings_cursor.to_list(10)
-    recent_bookings = [serialize_doc(booking) for booking in recent_bookings_raw]
+    recent_bookings = []
+    
+    for booking in recent_bookings_raw:
+        recent_bookings.append(serialize_doc(booking))
     
     return {
         "total_users": total_users,
