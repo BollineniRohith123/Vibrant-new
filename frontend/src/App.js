@@ -658,9 +658,11 @@ const BookingPage = () => {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [bookingLoading, setBookingLoading] = useState(false);
+  const [selectedBookingType, setSelectedBookingType] = useState('daily');
   const [paymentProof, setPaymentProof] = useState(null);
   const [utrNumber, setUtrNumber] = useState('');
   const [bookingId, setBookingId] = useState(null);
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
@@ -690,10 +692,11 @@ const BookingPage = () => {
     try {
       const response = await axios.post(`${API}/bookings`, {
         event_id: eventId,
-        booking_type: 'single'
+        booking_type: selectedBookingType
       });
       
       setBookingId(response.data.id);
+      setShowPaymentForm(true);
       toast.success('Booking created successfully! Please upload payment proof.');
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Booking failed');
@@ -723,6 +726,24 @@ const BookingPage = () => {
       navigate('/dashboard');
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Upload failed');
+    }
+  };
+
+  const getPrice = () => {
+    if (!event || !event.pricing) return 0;
+    return event.pricing[selectedBookingType] || 0;
+  };
+
+  const getBookingTypeDescription = (type) => {
+    switch (type) {
+      case 'daily':
+        return 'Single class access';
+      case 'weekly':
+        return '7 days unlimited access';
+      case 'monthly':
+        return '30 days unlimited access';
+      default:
+        return '';
     }
   };
 
@@ -761,7 +782,10 @@ const BookingPage = () => {
           <div className="p-8">
             <div className="flex items-center justify-between mb-6">
               <h1 className="text-3xl font-bold text-gray-900">{event.title}</h1>
-              <span className="text-3xl font-bold text-purple-600">₹{event.price}</span>
+              <div className="text-right">
+                <span className="text-3xl font-bold text-purple-600">₹{getPrice()}</span>
+                <p className="text-sm text-gray-500 capitalize">{selectedBookingType} Plan</p>
+              </div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-8">
@@ -769,7 +793,7 @@ const BookingPage = () => {
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Class Details</h2>
                 <p className="text-gray-600 mb-4">{event.description}</p>
 
-                <div className="space-y-3">
+                <div className="space-y-3 mb-6">
                   <div className="flex items-center text-gray-600">
                     <Calendar className="w-5 h-5 mr-3" />
                     <span>{event.date}</span>
@@ -780,11 +804,37 @@ const BookingPage = () => {
                   </div>
                   <div className="flex items-center text-gray-600">
                     <MapPin className="w-5 h-5 mr-3" />
-                    <span>{event.delivery_mode}</span>
+                    <span className="capitalize">{event.delivery_mode}</span>
                   </div>
                   <div className="flex items-center text-gray-600">
                     <Users className="w-5 h-5 mr-3" />
                     <span>Max {event.capacity} participants</span>
+                  </div>
+                </div>
+
+                {/* Booking Type Selection */}
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Choose Your Plan</h3>
+                  <div className="space-y-3">
+                    {event.pricing && Object.entries(event.pricing).map(([type, price]) => (
+                      <label key={type} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-300 transition-colors">
+                        <div className="flex items-center">
+                          <input
+                            type="radio"
+                            name="bookingType"
+                            value={type}
+                            checked={selectedBookingType === type}
+                            onChange={(e) => setSelectedBookingType(e.target.value)}
+                            className="mr-3 text-purple-600 focus:ring-purple-500"
+                          />
+                          <div>
+                            <p className="font-medium capitalize">{type} Plan</p>
+                            <p className="text-sm text-gray-500">{getBookingTypeDescription(type)}</p>
+                          </div>
+                        </div>
+                        <span className="text-lg font-bold text-purple-600">₹{price}</span>
+                      </label>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -794,7 +844,7 @@ const BookingPage = () => {
                 
                 {event.qr_code_base64 && (
                   <div className="mb-6">
-                    <p className="text-gray-600 mb-2">Scan this QR code to pay ₹{event.price}</p>
+                    <p className="text-gray-600 mb-2">Scan this QR code to pay ₹{getPrice()}</p>
                     <img 
                       src={event.qr_code_base64} 
                       alt="Payment QR Code" 
@@ -803,16 +853,21 @@ const BookingPage = () => {
                   </div>
                 )}
 
-                {!bookingId ? (
+                {!showPaymentForm ? (
                   <button
                     onClick={handleBooking}
                     disabled={bookingLoading}
                     className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-300 disabled:opacity-50"
                   >
-                    {bookingLoading ? 'Creating Booking...' : 'Book This Class'}
+                    {bookingLoading ? 'Creating Booking...' : `Book ${selectedBookingType.charAt(0).toUpperCase() + selectedBookingType.slice(1)} Plan - ₹${getPrice()}`}
                   </button>
                 ) : (
                   <div className="space-y-4">
+                    <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                      <p className="text-green-800 font-medium">Booking Created Successfully!</p>
+                      <p className="text-green-600 text-sm">Please upload your payment proof to complete the booking.</p>
+                    </div>
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Upload Payment Proof
@@ -827,7 +882,7 @@ const BookingPage = () => {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        UTR Number
+                        UTR Number / Transaction ID
                       </label>
                       <input
                         type="text"
@@ -842,7 +897,7 @@ const BookingPage = () => {
                       onClick={handlePaymentUpload}
                       className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
                     >
-                      Upload Payment Proof
+                      Submit Payment Proof
                     </button>
                   </div>
                 )}
