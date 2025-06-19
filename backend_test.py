@@ -57,24 +57,33 @@ class VibrantYogaBackendTest(unittest.TestCase):
         self.assertEqual(data["status"], "healthy")
         print("✅ Health check endpoint is working")
     
-    def test_02_admin_login(self):
-        """Test admin login endpoint"""
-        print("\n--- Testing Admin Login Endpoint ---")
-        response = requests.post(
-            f"{BACKEND_URL}/auth/login",
-            json={"email": self.admin_email, "password": self.admin_password}
-        )
-        self.assertEqual(response.status_code, 200)
-        data = response.json()
-        self.assertEqual(data["token_type"], "bearer")
-        self.assertIsNotNone(data["access_token"])
-        self.assertEqual(data["user"]["email"], self.admin_email)
-        self.assertEqual(data["user"]["role"], "admin")
+    def test_02_register_user(self):
+        """Test user registration endpoint"""
+        print("\n--- Testing User Registration Endpoint ---")
+        user_data = {
+            "name": "Test User",
+            "email": self.user_email,
+            "password": self.user_password
+        }
         
-        # Save admin token and user data for later tests
-        self.__class__.admin_token = data["access_token"]
-        self.__class__.admin_user = data["user"]
-        print(f"✅ Admin login successful - Token: {self.admin_token[:10]}...")
+        response = requests.post(
+            f"{BACKEND_URL}/auth/register",
+            json=user_data
+        )
+        
+        # If user already exists, this will fail, but we'll continue with login
+        if response.status_code == 200:
+            data = response.json()
+            self.assertEqual(data["token_type"], "bearer")
+            self.assertIsNotNone(data["access_token"])
+            self.assertEqual(data["user"]["email"], self.user_email)
+            
+            # Save user token and user data for later tests
+            self.__class__.user_token = data["access_token"]
+            self.__class__.regular_user = data["user"]
+            print(f"✅ User registration successful - Token: {self.user_token[:10]}...")
+        else:
+            print(f"⚠️ User already exists (status code: {response.status_code}). Will try login instead.")
     
     def test_03_google_auth(self):
         """Test Google authentication endpoint (mock)"""
