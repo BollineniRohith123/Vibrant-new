@@ -203,6 +203,7 @@ def create_jwt_token(user_data: dict) -> str:
         "role": user_data["role"],
         "exp": datetime.utcnow() + timedelta(days=7)
     }
+    print(f"Creating token with payload: {payload}")
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 def verify_jwt_token(token: str) -> dict:
