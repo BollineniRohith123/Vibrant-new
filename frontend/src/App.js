@@ -34,6 +34,22 @@ import './App.css';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyAh812rylYk4Zt8LSQDYb6iI3cdDLNCWQM",
+  authDomain: "guruze-46446.firebaseapp.com",
+  projectId: "guruze-46446",
+  storageBucket: "guruze-46446.firebasestorage.app",
+  messagingSenderId: "1056620611868",
+  appId: "1:1056620611868:web:fccf8066417beb850a92d9",
+  measurementId: "G-Z2L6FMC5WL"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const googleProvider = new GoogleAuthProvider();
+
 // Context for authentication
 const AuthContext = createContext();
 
