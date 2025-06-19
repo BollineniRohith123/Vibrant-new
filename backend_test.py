@@ -30,8 +30,8 @@ class VibrantYogaBackendTest(unittest.TestCase):
         cls.admin_password = "admin123"
         
         # Regular user credentials
-        cls.user_email = "user@example.com"
-        cls.user_password = "user123"
+        cls.user_email = "testuser@example.com"
+        cls.user_password = "Password123!"
         
         # Create a test QR code image
         cls.test_qr_image = cls._create_test_image()
