@@ -616,7 +616,12 @@ const ClassesPage = () => {
                     }`}>
                       {event.delivery_mode}
                     </span>
-                    <span className="text-2xl font-bold text-purple-600">₹{event.price}</span>
+                    <div className="text-right">
+                      <div className="text-sm text-gray-500">Starting from</div>
+                      <div className="text-2xl font-bold text-purple-600">
+                        ₹{event.pricing ? Math.min(...Object.values(event.pricing)) : 0}
+                      </div>
+                    </div>
                   </div>
 
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">{event.title}</h3>
