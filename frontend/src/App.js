@@ -1323,9 +1323,16 @@ const AdminEventsTab = () => {
                   <p className="text-sm text-gray-600">{event.description}</p>
                   <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
                     <span>{event.date} at {event.time}</span>
-                    <span>₹{event.price}</span>
                     <span className="capitalize">{event.delivery_mode}</span>
+                    <span>Capacity: {event.capacity}</span>
                   </div>
+                  {event.pricing && (
+                    <div className="flex items-center space-x-4 mt-1 text-sm text-purple-600">
+                      <span>Daily: ₹{event.pricing.daily}</span>
+                      <span>Weekly: ₹{event.pricing.weekly}</span>
+                      <span>Monthly: ₹{event.pricing.monthly}</span>
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center space-x-2">
                   <button className="text-blue-600 hover:text-blue-700">
