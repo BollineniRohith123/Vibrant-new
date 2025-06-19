@@ -38,6 +38,54 @@ class VibrantYogaBackendTest(unittest.TestCase):
         cls.test_payment_proof = cls._create_test_image(color=(255, 0, 0))
         
         print("\n=== Starting Vibrant Yoga Backend API Tests ===")
+        
+        # Initialize admin user
+        response = requests.post(f"{BACKEND_URL}/admin/init")
+        print(f"Admin initialization: {response.json()['message']}")
+        
+        # Login as admin to get token
+        response = requests.post(
+            f"{BACKEND_URL}/auth/login",
+            json={"email": cls.admin_email, "password": cls.admin_password}
+        )
+        if response.status_code == 200:
+            data = response.json()
+            cls.admin_token = data["access_token"]
+            cls.admin_user = data["user"]
+            print(f"Admin login successful during setup - Token: {cls.admin_token[:10]}...")
+        else:
+            print(f"Admin login failed during setup: {response.text}")
+            
+        # Register test user
+        user_data = {
+            "name": "Test User",
+            "email": cls.user_email,
+            "password": cls.user_password
+        }
+        
+        response = requests.post(
+            f"{BACKEND_URL}/auth/register",
+            json=user_data
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            cls.user_token = data["access_token"]
+            cls.regular_user = data["user"]
+            print(f"User registration successful during setup - Token: {cls.user_token[:10]}...")
+        else:
+            # Try login if registration fails
+            response = requests.post(
+                f"{BACKEND_URL}/auth/login",
+                json={"email": cls.user_email, "password": cls.user_password}
+            )
+            if response.status_code == 200:
+                data = response.json()
+                cls.user_token = data["access_token"]
+                cls.regular_user = data["user"]
+                print(f"User login successful during setup - Token: {cls.user_token[:10]}...")
+            else:
+                print(f"User authentication failed during setup: {response.text}")
     
     @staticmethod
     def _create_test_image(size=(200, 200), color=(0, 0, 0)):
