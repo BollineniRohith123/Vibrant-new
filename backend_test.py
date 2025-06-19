@@ -412,65 +412,83 @@ class VibrantYogaBackendTest(unittest.TestCase):
         # differentiate between admin and user roles for all endpoints
         print("✅ Note: Role-based access control partially implemented")
     
-    def test_15_admin_dashboard(self):
+    def test_18_admin_dashboard(self):
         """Test admin dashboard endpoint (admin only)"""
         print("\n--- Testing Admin Dashboard Endpoint (Admin Only) ---")
-        try:
-            # Test with admin token
-            response = requests.get(
-                f"{BACKEND_URL}/admin/dashboard",
-                headers={"Authorization": f"Bearer {self.admin_token}"}
-            )
-            self.assertEqual(response.status_code, 200)
-            data = response.json()
-            self.assertIn("total_users", data)
-            self.assertIn("total_events", data)
-            self.assertIn("total_bookings", data)
-            print("✅ Admin dashboard access successful")
-        except Exception as e:
-            print(f"⚠️ Admin dashboard test failed: {str(e)}")
-            print("⚠️ This may be due to database initialization issues")
-            # Don't fail the test as this might be an environment issue
-            pass
+        # Test with admin token
+        response = requests.get(
+            f"{BACKEND_URL}/admin/dashboard",
+            headers={"Authorization": f"Bearer {self.admin_token}"}
+        )
+        
+        print(f"Response status code: {response.status_code}")
+        if response.status_code != 200:
+            print(f"Error response: {response.text}")
+        
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        
+        # Verify dashboard data structure
+        self.assertIn("total_users", data)
+        self.assertIn("total_events", data)
+        self.assertIn("total_bookings", data)
+        self.assertIn("pending_bookings", data)
+        self.assertIn("approved_bookings", data)
+        self.assertIn("total_revenue", data)
+        self.assertIn("recent_bookings", data)
+        
+        print("✅ Admin dashboard access successful")
+        print(f"✅ Dashboard stats: {data['total_users']} users, {data['total_events']} events, {data['total_bookings']} bookings")
+        print(f"✅ Revenue: ₹{data['total_revenue']}")
     
-    def test_16_smtp_settings(self):
+    def test_19_smtp_settings(self):
         """Test SMTP settings endpoints (admin only)"""
         print("\n--- Testing SMTP Settings Endpoints (Admin Only) ---")
-        try:
-            # Test get SMTP settings
-            response = requests.get(
-                f"{BACKEND_URL}/admin/smtp-settings",
-                headers={"Authorization": f"Bearer {self.admin_token}"}
-            )
-            self.assertEqual(response.status_code, 200)
-            data = response.json()
-            self.assertIn("host", data)
-            self.assertIn("port", data)
-            self.assertIn("username", data)
-            print("✅ Get SMTP settings successful")
+        # Test get SMTP settings
+        response = requests.get(
+            f"{BACKEND_URL}/admin/smtp-settings",
+            headers={"Authorization": f"Bearer {self.admin_token}"}
+        )
+        
+        print(f"Response status code: {response.status_code}")
+        if response.status_code != 200:
+            print(f"Error response: {response.text}")
             
-            # Test update SMTP settings
-            smtp_data = {
-                "mailer_name": "Vibrant Yoga Test",
-                "host": "smtp.example.com",
-                "port": 587,
-                "username": "test@example.com",
-                "email": "test@example.com",
-                "encryption": "TLS",
-                "password": "test_password"
-            }
-            response = requests.post(
-                f"{BACKEND_URL}/admin/smtp-settings",
-                json=smtp_data,
-                headers={"Authorization": f"Bearer {self.admin_token}"}
-            )
-            self.assertEqual(response.status_code, 200)
-            print("✅ Update SMTP settings successful")
-        except Exception as e:
-            print(f"⚠️ SMTP settings test failed: {str(e)}")
-            print("⚠️ This may be due to database initialization issues")
-            # Don't fail the test as this might be an environment issue
-            pass
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        
+        # Verify SMTP settings structure
+        self.assertIn("host", data)
+        self.assertIn("port", data)
+        self.assertIn("username", data)
+        self.assertIn("email", data)
+        
+        print("✅ Get SMTP settings successful")
+        
+        # Test update SMTP settings
+        smtp_data = {
+            "id": data.get("id", "new_settings_id"),
+            "mailer_name": "Vibrant Yoga Test",
+            "host": "smtp.example.com",
+            "port": 587,
+            "username": "test@example.com",
+            "email": "test@example.com",
+            "encryption": "TLS",
+            "password": "test_password"
+        }
+        
+        response = requests.post(
+            f"{BACKEND_URL}/admin/smtp-settings",
+            json=smtp_data,
+            headers={"Authorization": f"Bearer {self.admin_token}"}
+        )
+        
+        print(f"Update response status code: {response.status_code}")
+        if response.status_code != 200:
+            print(f"Error response: {response.text}")
+            
+        self.assertEqual(response.status_code, 200)
+        print("✅ Update SMTP settings successful")
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
