@@ -85,22 +85,44 @@ class VibrantYogaBackendTest(unittest.TestCase):
         else:
             print(f"⚠️ User already exists (status code: {response.status_code}). Will try login instead.")
     
-    def test_03_google_auth(self):
-        """Test Google authentication endpoint (mock)"""
-        print("\n--- Testing Google Auth Endpoint (Mock) ---")
+    def test_03_admin_login(self):
+        """Test admin login endpoint"""
+        print("\n--- Testing Admin Login Endpoint ---")
         response = requests.post(
-            f"{BACKEND_URL}/auth/google",
-            params={"token": "mock_google_token"}
+            f"{BACKEND_URL}/auth/login",
+            json={"email": self.admin_email, "password": self.admin_password}
         )
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertEqual(data["token_type"], "bearer")
         self.assertIsNotNone(data["access_token"])
+        self.assertEqual(data["user"]["email"], self.admin_email)
+        self.assertEqual(data["user"]["role"], "admin")
         
-        # Save user token and data for later tests
-        self.__class__.user_token = data["access_token"]
-        self.__class__.regular_user = data["user"]
-        print(f"✅ Google auth successful - Token: {self.user_token[:10]}...")
+        # Save admin token and user data for later tests
+        self.__class__.admin_token = data["access_token"]
+        self.__class__.admin_user = data["user"]
+        print(f"✅ Admin login successful - Token: {self.admin_token[:10]}...")
+    
+    def test_04_user_login(self):
+        """Test user login endpoint if registration failed"""
+        if not hasattr(self, 'user_token') or self.user_token is None:
+            print("\n--- Testing User Login Endpoint ---")
+            response = requests.post(
+                f"{BACKEND_URL}/auth/login",
+                json={"email": self.user_email, "password": self.user_password}
+            )
+            self.assertEqual(response.status_code, 200)
+            data = response.json()
+            self.assertEqual(data["token_type"], "bearer")
+            self.assertIsNotNone(data["access_token"])
+            
+            # Save user token and data for later tests
+            self.__class__.user_token = data["access_token"]
+            self.__class__.regular_user = data["user"]
+            print(f"✅ User login successful - Token: {self.user_token[:10]}...")
+        else:
+            print("\n--- Skipping User Login (Already authenticated) ---")
     
     def test_04_get_current_user(self):
         """Test get current user endpoint"""
