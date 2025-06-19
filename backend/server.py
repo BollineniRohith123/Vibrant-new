@@ -214,6 +214,8 @@ def verify_jwt_token(token: str) -> dict:
         raise HTTPException(status_code=401, detail="Token expired")
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
+    except Exception as e:
+        raise HTTPException(status_code=401, detail=f"Token verification error: {str(e)}")
 
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
     """Get current user from JWT token"""
@@ -228,7 +230,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         
         return serialize_doc(user_doc)
     except Exception as e:
-        raise HTTPException(status_code=401, detail="Invalid token")
+        raise HTTPException(status_code=401, detail=f"Authentication error: {str(e)}")
 
 async def get_admin_user(current_user: dict = Depends(get_current_user)):
     """Ensure current user is admin"""
