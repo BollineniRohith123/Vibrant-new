@@ -98,6 +98,217 @@
 
 
 
-#====================================================================================================
-# Testing Data - Main Agent and testing sub agent both should log testing data below this section
-#====================================================================================================
+user_problem_statement: "Test the complete Vibrant Yoga Application backend that I just created. Please test all the core endpoints including authentication, user management, event management, booking management, admin dashboard, and health check."
+
+backend:
+  - task: "Health Check Endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Health check endpoint is working correctly, returning 200 OK with status and timestamp."
+
+  - task: "Authentication - Login"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Login endpoint works correctly with admin credentials (admin@vibrantyoga.com/admin123), returning token and user data."
+
+  - task: "Authentication - Google Auth"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Google auth endpoint works with mock token, returning proper token and user data."
+
+  - task: "User Management - Get Current User"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Get current user endpoint works correctly with authentication token, returning user details."
+
+  - task: "User Management - Get All Users"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Get all users endpoint works correctly with admin token, returning list of users. Note: Role-based access control is partially implemented."
+
+  - task: "User Management - Update User Role"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Update user role endpoint works correctly, allowing admin to change user roles between 'user' and 'admin'."
+
+  - task: "Event Management - Get Events"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Get events endpoint works correctly, returning list of events."
+
+  - task: "Event Management - Create Event"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Create event endpoint works correctly with admin token, creating new events with all required fields. Note: Role-based access control is partially implemented."
+
+  - task: "Event Management - Get Event by ID"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Get event by ID endpoint works correctly, returning event details for a specific event ID."
+
+  - task: "Event Management - Upload QR Code"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Upload QR code endpoint works correctly, allowing file upload and storing base64 encoded image in the event data."
+
+  - task: "Booking Management - Create Booking"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Create booking endpoint works correctly, creating new bookings with pending status. Email sending fails due to SMTP configuration, but this doesn't affect core functionality."
+
+  - task: "Booking Management - Get Bookings"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Get bookings endpoint works correctly, returning user's bookings or all bookings for admin users."
+
+  - task: "Booking Management - Upload Payment Proof"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Upload payment proof endpoint works correctly, allowing file upload and storing base64 encoded image in the booking data."
+
+  - task: "Booking Management - Update Booking Status"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "Update booking status endpoint works correctly, allowing admin to change booking status. Note: Role-based access control is partially implemented."
+
+  - task: "Admin Dashboard"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "Admin dashboard endpoint returns 500 Internal Server Error. Error logs show an issue with MongoDB ObjectId serialization: 'ObjectId' object is not iterable. This needs to be fixed by ensuring all MongoDB ObjectIds are converted to strings before serialization."
+
+  - task: "Admin SMTP Settings"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 1
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "SMTP settings endpoints return 500 Internal Server Error in some cases. Similar to the admin dashboard issue, there appears to be a problem with MongoDB ObjectId serialization."
+
+metadata:
+  created_by: "testing_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Admin Dashboard"
+    - "Admin SMTP Settings"
+  stuck_tasks:
+    - "Admin Dashboard"
+    - "Admin SMTP Settings"
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+    - agent: "testing"
+      message: "I've completed testing of all backend endpoints. Most endpoints are working correctly, but there are issues with the Admin Dashboard and SMTP Settings endpoints. Both return 500 Internal Server Error due to MongoDB ObjectId serialization issues. The error logs show 'ObjectId' object is not iterable and 'vars() argument must have __dict__ attribute' errors. These need to be fixed by ensuring all MongoDB ObjectIds are converted to strings before serialization. All other endpoints are working as expected, though there are some minor issues with role-based access control and email sending."
