@@ -1340,7 +1340,9 @@ const CreateEventForm = ({ onClose, onSuccess }) => {
     description: '',
     date: '',
     time: '',
-    price: '',
+    daily_price: '',
+    weekly_price: '',
+    monthly_price: '',
     delivery_mode: 'online',
     capacity: 50,
     session_link: ''
@@ -1356,16 +1358,18 @@ const CreateEventForm = ({ onClose, onSuccess }) => {
       // Create event
       const eventResponse = await axios.post(`${API}/events`, {
         ...formData,
-        price: parseFloat(formData.price),
+        daily_price: parseFloat(formData.daily_price),
+        weekly_price: parseFloat(formData.weekly_price),
+        monthly_price: parseFloat(formData.monthly_price),
         capacity: parseInt(formData.capacity),
         is_online: formData.delivery_mode !== 'offline'
       });
 
       // Upload QR code if provided
       if (qrFile) {
-        const formData = new FormData();
-        formData.append('file', qrFile);
-        await axios.post(`${API}/events/${eventResponse.data.id}/qr-code`, formData, {
+        const formDataFile = new FormData();
+        formDataFile.append('file', qrFile);
+        await axios.post(`${API}/events/${eventResponse.data.id}/qr-code`, formDataFile, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
       }
@@ -1402,11 +1406,11 @@ const CreateEventForm = ({ onClose, onSuccess }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Price (₹)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Capacity</label>
             <input
               type="number"
-              value={formData.price}
-              onChange={(e) => setFormData({...formData, price: e.target.value})}
+              value={formData.capacity}
+              onChange={(e) => setFormData({...formData, capacity: e.target.value})}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               required
             />
@@ -1424,7 +1428,7 @@ const CreateEventForm = ({ onClose, onSuccess }) => {
           />
         </div>
 
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
             <input
@@ -1446,13 +1450,40 @@ const CreateEventForm = ({ onClose, onSuccess }) => {
               required
             />
           </div>
+        </div>
 
+        <div className="grid md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Capacity</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Daily Price (₹)</label>
             <input
               type="number"
-              value={formData.capacity}
-              onChange={(e) => setFormData({...formData, capacity: e.target.value})}
+              step="0.01"
+              value={formData.daily_price}
+              onChange={(e) => setFormData({...formData, daily_price: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Weekly Price (₹)</label>
+            <input
+              type="number"
+              step="0.01"
+              value={formData.weekly_price}
+              onChange={(e) => setFormData({...formData, weekly_price: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Monthly Price (₹)</label>
+            <input
+              type="number"
+              step="0.01"
+              value={formData.monthly_price}
+              onChange={(e) => setFormData({...formData, monthly_price: e.target.value})}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               required
             />
