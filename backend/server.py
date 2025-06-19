@@ -212,10 +212,12 @@ async def get_admin_user(current_user: dict = Depends(get_current_user)):
 async def send_email(to_email: str, subject: str, body: str):
     """Send email using SMTP settings"""
     try:
-        smtp_settings = await db.smtp_settings.find_one({})
-        if not smtp_settings:
+        smtp_settings_raw = await db.smtp_settings.find_one({})
+        if not smtp_settings_raw:
             # Use default settings
             smtp_settings = SMTPSettings().dict()
+        else:
+            smtp_settings = serialize_doc(smtp_settings_raw)
         
         msg = MIMEMultipart()
         msg['From'] = smtp_settings['email']
