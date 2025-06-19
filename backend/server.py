@@ -55,9 +55,38 @@ except Exception as e:
     print(f"Firebase initialization failed: {e}")
     firebase_initialized = False
 
+# Custom JSON Encoder for ObjectId
+class JSONEncoder(json.JSONEncoder):
+    def default(self, obj: Any) -> Any:
+        if isinstance(obj, ObjectId):
+            return str(obj)
+        return super().default(obj)
+
+def serialize_doc(doc: dict) -> dict:
+    """Convert MongoDB document to JSON serializable format"""
+    if doc is None:
+        return None
+    
+    # Convert ObjectId to string
+    if '_id' in doc:
+        doc['id'] = str(doc['_id'])
+        del doc['_id']
+    
+    # Convert any other ObjectId fields
+    for key, value in doc.items():
+        if isinstance(value, ObjectId):
+            doc[key] = str(value)
+        elif isinstance(value, list):
+            doc[key] = [str(item) if isinstance(item, ObjectId) else item for item in value]
+    
+    return doc
+
 # Create the main app
 app = FastAPI(title="Vibrant Yoga API", version="1.0.0")
 api_router = APIRouter(prefix="/api")
+
+# Set custom JSON encoder
+app.json_encoder = JSONEncoder
 
 # Security
 security = HTTPBearer()
