@@ -268,13 +268,12 @@ class VibrantYogaBackendTest(unittest.TestCase):
         self.assertTrue(data["qr_code_base64"].startswith("data:image/png;base64,"))
         print("✅ QR code verified in event data")
     
-    def test_11_create_booking(self):
-        """Test create booking endpoint"""
-        print("\n--- Testing Create Booking Endpoint ---")
+    def test_12_create_daily_booking(self):
+        """Test create daily booking endpoint"""
+        print("\n--- Testing Create Daily Booking Endpoint ---")
         booking_data = {
             "event_id": self.test_event_id,
-            "booking_type": "single",
-            "utr_number": "TEST123456789"
+            "booking_type": "daily"
         }
         
         # Test with user token
@@ -287,10 +286,67 @@ class VibrantYogaBackendTest(unittest.TestCase):
         data = response.json()
         self.assertEqual(data["event_id"], self.test_event_id)
         self.assertEqual(data["status"], "pending")
+        self.assertEqual(data["booking_type"], "daily")
+        
+        # Verify amount is set correctly based on daily price
+        self.assertEqual(data["amount"], 500)
         
         # Save booking ID for later tests
         self.__class__.test_booking_id = data["id"]
-        print(f"✅ Created test booking with ID: {self.test_booking_id}")
+        print(f"✅ Created daily booking with ID: {self.test_booking_id}")
+        print(f"✅ Booking amount verified: ₹{data['amount']}")
+    
+    def test_13_create_weekly_booking(self):
+        """Test create weekly booking endpoint"""
+        print("\n--- Testing Create Weekly Booking Endpoint ---")
+        booking_data = {
+            "event_id": self.test_event_id,
+            "booking_type": "weekly"
+        }
+        
+        # Test with user token
+        response = requests.post(
+            f"{BACKEND_URL}/bookings",
+            json=booking_data,
+            headers={"Authorization": f"Bearer {self.user_token}"}
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["event_id"], self.test_event_id)
+        self.assertEqual(data["status"], "pending")
+        self.assertEqual(data["booking_type"], "weekly")
+        
+        # Verify amount is set correctly based on weekly price
+        self.assertEqual(data["amount"], 2000)
+        
+        print(f"✅ Created weekly booking with ID: {data['id']}")
+        print(f"✅ Booking amount verified: ₹{data['amount']}")
+    
+    def test_14_create_monthly_booking(self):
+        """Test create monthly booking endpoint"""
+        print("\n--- Testing Create Monthly Booking Endpoint ---")
+        booking_data = {
+            "event_id": self.test_event_id,
+            "booking_type": "monthly"
+        }
+        
+        # Test with user token
+        response = requests.post(
+            f"{BACKEND_URL}/bookings",
+            json=booking_data,
+            headers={"Authorization": f"Bearer {self.user_token}"}
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["event_id"], self.test_event_id)
+        self.assertEqual(data["status"], "pending")
+        self.assertEqual(data["booking_type"], "monthly")
+        
+        # Verify amount is set correctly based on monthly price
+        self.assertEqual(data["amount"], 6000)
+        
+        print(f"✅ Created monthly booking with ID: {data['id']}")
+        print(f"✅ Booking amount verified: ₹{data['amount']}")
     
     def test_12_get_bookings(self):
         """Test get bookings endpoint"""
