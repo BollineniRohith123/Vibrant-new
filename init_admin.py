@@ -2,8 +2,8 @@
 import asyncio
 from motor.motor_asyncio import AsyncIOMotorClient
 import bcrypt
-import uuid
 from datetime import datetime
+from bson import ObjectId
 
 async def init_admin():
     # MongoDB connection
@@ -16,7 +16,8 @@ async def init_admin():
     
     # Create admin user
     admin_data = {
-        "id": str(uuid.uuid4()),
+        "_id": ObjectId(),
+        "id": str(ObjectId()),
         "name": "Admin User",
         "email": "admin@vibrantyoga.com",
         "password_hash": password_hash,
