@@ -316,6 +316,9 @@ async def login(request: UserLogin):
     user_data = serialize_doc(user_doc)
     
     # Verify password
+    if "password_hash" not in user_data:
+        raise HTTPException(status_code=401, detail="Invalid credentials - no password hash found")
+    
     if not verify_password(request.password, user_data["password_hash"]):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
