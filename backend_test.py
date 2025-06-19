@@ -198,20 +198,20 @@ class VibrantYogaBackendTest(unittest.TestCase):
         self.assertIsInstance(data, list)
         print(f"✅ Get events successful - Found {len(data)} events")
     
-    def test_08_create_event(self):
-        """Test create event endpoint (admin only)"""
-        print("\n--- Testing Create Event Endpoint (Admin Only) ---")
+    def test_09_create_event_with_pricing(self):
+        """Test create event endpoint with pricing tiers (admin only)"""
+        print("\n--- Testing Create Event Endpoint with Pricing Tiers (Admin Only) ---")
         event_data = {
-            "title": "Test Yoga Session",
-            "description": "This is a test yoga session created by automated tests",
-            "date": datetime.now().strftime("%Y-%m-%d"),
-            "time": "10:00",
-            "price": 500.0,
-            "upi_id": "test@upi",
-            "is_online": True,
-            "session_link": "https://zoom.us/test",
-            "capacity": 20,
-            "delivery_mode": "online"
+            "title": "Morning Hatha Yoga",
+            "description": "Relaxing yoga session for beginners",
+            "date": "2025-06-25",
+            "time": "08:00",
+            "daily_price": 500,
+            "weekly_price": 2000,
+            "monthly_price": 6000,
+            "delivery_mode": "online",
+            "capacity": 25,
+            "session_link": "https://zoom.us/j/123456789"
         }
         
         # Test with admin token
@@ -223,15 +223,17 @@ class VibrantYogaBackendTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertEqual(data["title"], event_data["title"])
-        self.assertEqual(data["price"], event_data["price"])
+        
+        # Verify pricing structure
+        self.assertIn("pricing", data)
+        self.assertEqual(data["pricing"]["daily"], event_data["daily_price"])
+        self.assertEqual(data["pricing"]["weekly"], event_data["weekly_price"])
+        self.assertEqual(data["pricing"]["monthly"], event_data["monthly_price"])
         
         # Save event ID for later tests
         self.__class__.test_event_id = data["id"]
         print(f"✅ Created test event with ID: {self.test_event_id}")
-        
-        # Note: In this implementation, the mock token system doesn't properly
-        # differentiate between admin and user roles for all endpoints
-        print("✅ Note: Role-based access control partially implemented")
+        print(f"✅ Pricing tiers verified: Daily: ₹{data['pricing']['daily']}, Weekly: ₹{data['pricing']['weekly']}, Monthly: ₹{data['pricing']['monthly']}")
     
     def test_09_get_event_by_id(self):
         """Test get event by ID endpoint"""
