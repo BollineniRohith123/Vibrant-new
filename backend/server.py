@@ -568,10 +568,12 @@ async def get_admin_dashboard(current_user: dict = Depends(get_admin_user)):
 @api_router.get("/admin/smtp-settings")
 async def get_smtp_settings(current_user: dict = Depends(get_admin_user)):
     """Get SMTP settings (admin only)"""
-    settings = await db.smtp_settings.find_one({})
-    if not settings:
+    settings_raw = await db.smtp_settings.find_one({})
+    if not settings_raw:
         # Return default settings
         return SMTPSettings().dict()
+    
+    settings = serialize_doc(settings_raw)
     return settings
 
 @api_router.post("/admin/smtp-settings")
