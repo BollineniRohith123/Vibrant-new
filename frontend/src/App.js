@@ -1178,7 +1178,7 @@ const AdminDashboardTab = ({ data }) => {
   return (
     <div className="space-y-6">
       {/* Stats Grid */}
-      <div className="grid md:grid-cols-4 gap-6">
+      <div className="grid md:grid-cols-5 gap-6">
         <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
@@ -1218,6 +1218,16 @@ const AdminDashboardTab = ({ data }) => {
             <Clock className="w-8 h-8 text-yellow-200" />
           </div>
         </div>
+
+        <div className="bg-gradient-to-r from-pink-500 to-pink-600 rounded-lg p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-pink-100">Revenue</p>
+              <p className="text-3xl font-bold">₹{data.total_revenue || 0}</p>
+            </div>
+            <DollarSign className="w-8 h-8 text-pink-200" />
+          </div>
+        </div>
       </div>
 
       {/* Recent Bookings */}
@@ -1235,7 +1245,7 @@ const AdminDashboardTab = ({ data }) => {
                   <div>
                     <p className="font-medium text-gray-900">Booking #{booking.id.slice(0, 8)}...</p>
                     <p className="text-sm text-gray-500">
-                      {new Date(booking.created_at).toLocaleDateString()}
+                      {new Date(booking.created_at).toLocaleDateString()} - {booking.booking_type} (₹{booking.amount})
                     </p>
                   </div>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
